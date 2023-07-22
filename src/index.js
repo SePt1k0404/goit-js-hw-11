@@ -1,5 +1,8 @@
 import Notiflix from 'notiflix';
 import axios from 'axios';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import simpleLightbox from 'simplelightbox';
 
 const refs = {
   formEl: document.querySelector('.search-form'),
@@ -17,6 +20,7 @@ const NUMBER_OF_IMAGE = 40;
 let countOfPage = 1;
 let qValue = null;
 let totalHits = null;
+let gallery = null;
 
 refs.brtMoreEl.classList.toggle('hidden');
 refs.formEl.addEventListener('submit', formHandler);
@@ -43,6 +47,8 @@ async function moreImageOnClick() {
         item.downloads
       );
     });
+    gallery.refresh();
+    Notiflix.Notify.success(`"Hooray! We found ${totalHits} images."`);
     refs.brtMoreEl.classList.toggle('hidden');
   } catch (error) {
     Notiflix.Notify.failure(`Sorry, ${error.message}`);
@@ -53,25 +59,21 @@ async function formHandler(evt) {
   evt.preventDefault();
   countOfPage = 1;
   qValue = evt.target.elements[0].value.trim();
-  refs.brtMoreEl.classList.remove('hidden');
-  refs.endOfListEL.classList.add('hidden');
   if (qValue === '') {
     Notiflix.Notify.failure('Sorry, the search must not be empty');
   } else {
     try {
       const data = await searchImage(qValue, countOfPage);
       totalHits = data.totalHits;
-      console.log(totalHits);
-      if (totalHits <= NUMBER_OF_IMAGE) {
-        refs.brtMoreEl.classList.add('hidden');
-        refs.endOfListEL.classList.remove('hidden');
-      }
       if (!data.hits.length) {
         refs.galleryEl.innerHTML = '';
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
       } else {
+        refs.brtMoreEl.classList.remove('hidden');
+        refs.endOfListEL.classList.add('hidden');
+        Notiflix.Notify.success(`"Hooray! We found ${totalHits} images."`);
         refs.galleryEl.innerHTML = '';
         data.hits.forEach(item => {
           renderMarkup(
@@ -84,7 +86,23 @@ async function formHandler(evt) {
             item.downloads
           );
         });
+        const { height: cardHeight } = document
+          .querySelector('.gallery')
+          .firstElementChild.getBoundingClientRect();
+        window.scrollBy({
+          top: cardHeight,
+          behavior: 'smooth',
+        });
+        if (totalHits <= NUMBER_OF_IMAGE) {
+          refs.brtMoreEl.classList.add('hidden');
+          refs.endOfListEL.classList.remove('hidden');
+        }
       }
+      gallery = new SimpleLightbox('.gallery .photo-card a', {
+        captionsData: 'alt',
+        captionPosition: 'bottom',
+        captionDelay: 250,
+      });
     } catch (error) {
       Notiflix.Notify.failure(`Sorry, ${error.message}`);
     }
@@ -112,7 +130,7 @@ function renderMarkup(
   refs.galleryEl.insertAdjacentHTML(
     'beforeend',
     `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" width="100%" height="300"/>
+  <a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" width="100%" height="300"/></a>
   <div class="info">
     <p class="info-item">
       <b>Likes: ${likes}</b>
