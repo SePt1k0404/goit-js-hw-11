@@ -2,7 +2,6 @@ import Notiflix from 'notiflix';
 import axios from 'axios';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import simpleLightbox from 'simplelightbox';
 
 const refs = {
   formEl: document.querySelector('.search-form'),
@@ -48,6 +47,13 @@ async function moreImageOnClick() {
       );
     });
     gallery.refresh();
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 0.55,
+      behavior: 'smooth',
+    });
     Notiflix.Notify.success(`"Hooray! We found ${totalHits} images."`);
     refs.brtMoreEl.classList.toggle('hidden');
   } catch (error) {
@@ -90,7 +96,7 @@ async function formHandler(evt) {
           .querySelector('.gallery')
           .firstElementChild.getBoundingClientRect();
         window.scrollBy({
-          top: cardHeight,
+          top: cardHeight * 0.15,
           behavior: 'smooth',
         });
         if (totalHits <= NUMBER_OF_IMAGE) {
