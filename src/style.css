@@ -2,6 +2,32 @@ body {
   background-color: darkolivegreen;
 }
 
+.load-more {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.load-more:hover {
+  background-color: #45a049;
+}
+
+.load-more:active {
+  background-color: #3e8942;
+}
+
 .container {
   width: 1158px;
   margin-right: auto;
